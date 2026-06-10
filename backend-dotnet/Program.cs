@@ -1,10 +1,15 @@
+using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using PotionBrewery.Api;
 using PotionBrewery.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// In-memory SQLite — singleton connection kept open
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+});
+
 var connection = new SqliteConnection("Data Source=:memory:");
 connection.Open();
 builder.Services.AddSingleton(connection);
@@ -26,18 +31,14 @@ builder.Services
 
 var app = builder.Build();
 
-// Initialize database
 DbInit.Initialize(app.Services.GetRequiredService<SqliteConnection>());
 
 app.UseCors();
 
-// REST endpoints
 app.MapAlchemistEndpoints();
 
-// GraphQL
 app.MapGraphQL("/graphql");
 
-// Health check
 app.MapGet("/health", () => new { status = "OK", timestamp = DateTime.UtcNow });
 
 var port = Environment.GetEnvironmentVariable("PORT") ?? "4000";

@@ -104,7 +104,6 @@ export function AlchemistProfile({ alchemistName, isEditing, setIsEditing, onPro
 
   useEffect(() => {
     fetchProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alchemistName]);
 
   return (

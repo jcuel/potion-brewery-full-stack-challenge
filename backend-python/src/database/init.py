@@ -17,7 +17,6 @@ from src.database.sample_data import (
     NOTE_CLOSINGS,
 )
 
-# In-memory SQLite database
 db = sqlite3.connect(':memory:', check_same_thread=False)
 db.row_factory = sqlite3.Row
 
@@ -55,7 +54,6 @@ def initialize_database():
     """Create tables and seed with sample data."""
     cursor = db.cursor()
 
-    # Create alchemist_profiles table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS alchemist_profiles (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -66,7 +64,6 @@ def initialize_database():
         )
     ''')
 
-    # Create potion_orders table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS potion_orders (
             id TEXT PRIMARY KEY,
@@ -82,18 +79,15 @@ def initialize_database():
 
     db.commit()
 
-    # Load profile images
     bramblewood_img = load_image_as_base64('Bramblewood.png')
     thistle_img = load_image_as_base64('Thistle.png')
     sage_img = load_image_as_base64('Sage.png')
 
-    # Calculate service start dates
     now = datetime.now()
     bramblewood_start = (now.replace(year=now.year - 127)).strftime('%Y-%m-%d')
     thistle_start = (now.replace(year=now.year - 43)).strftime('%Y-%m-%d')
     sage_start = (now.replace(year=now.year - 15)).strftime('%Y-%m-%d')
 
-    # Insert alchemists
     alchemists = [
         ('Bramblewood Fizzwick', bramblewood_start, bramblewood_img),
         ('Thistle Moonwhisper', thistle_start, thistle_img),
@@ -106,7 +100,6 @@ def initialize_database():
             (name, start_date, image)
         )
 
-    # Insert sample potion orders
     sample_orders = [
         ('1', 'Elena Vasquez', 'Barcelona, Spain', 'Essence of Invisibility',
          'Thistle Moonwhisper', 'To Do',
@@ -131,8 +124,7 @@ def initialize_database():
             order
         )
 
-    # Generate 47 healing elixir orders in 'Quality Control' assigned to Bramblewood Fizzwick
-    rng = random.Random(42)  # Deterministic seed for reproducibility
+    rng = random.Random(42)
     for i in range(ELIXIR_COUNT):
         order_id = str(7 + i)
         first_name = rng.choice(SAMPLE_FIRST_NAMES)

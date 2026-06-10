@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation, gql } from '@apollo/client';
+import { useState, useEffect, useCallback } from 'react';
+import { graphqlRequest } from '../utils/graphql';
 import { getInitials } from '../utils/helpers';
 import { getStatusEmoji, POLL_INTERVAL_MS, POTION_ORDER_STATUSES } from '../constants';
 import { CreatePotionModal } from './modals/CreatePotionModal';
@@ -7,7 +7,7 @@ import { ReassignModal } from './modals/ReassignModal';
 import type { PotionOrder, AlchemistProfileMinimal } from '../types';
 import styles from './PotionBoard.module.css';
 
-const GET_POTION_ORDERS = gql`
+const GET_POTION_ORDERS = `
   query GetPotionOrders($filter: PotionOrderFilter) {
     potionOrders(filter: $filter) {
       id
@@ -21,7 +21,7 @@ const GET_POTION_ORDERS = gql`
   }
 `;
 
-const UPDATE_POTION_ORDER_STATUS = gql`
+const UPDATE_POTION_ORDER_STATUS = `
   mutation UpdatePotionOrderStatus($id: ID!, $status: String!) {
     updatePotionOrderStatus(id: $id, status: $status) {
       id
@@ -30,7 +30,7 @@ const UPDATE_POTION_ORDER_STATUS = gql`
   }
 `;
 
-const UPDATE_POTION_ORDER_ALCHEMIST = gql`
+const UPDATE_POTION_ORDER_ALCHEMIST = `
   mutation UpdatePotionOrderAlchemist($id: ID!, $assigned_alchemist: String!) {
     updatePotionOrderAlchemist(id: $id, assigned_alchemist: $assigned_alchemist) {
       id
@@ -39,7 +39,7 @@ const UPDATE_POTION_ORDER_ALCHEMIST = gql`
   }
 `;
 
-const ADD_POTION_ORDER = gql`
+const ADD_POTION_ORDER = `
   mutation AddPotionOrder($input: PotionOrderInput!) {
     addPotionOrder(input: $input) {
       id
@@ -69,33 +69,44 @@ export function PotionBoard({ alchemistName, profileUpdateTrigger }: PotionBoard
   const [alchemistProfiles, setAlchemistProfiles] = useState<Map<string, AlchemistProfileMinimal>>(new Map());
   const [actionError, setActionError] = useState<string | null>(null);
 
-  const { loading, error, data } = useQuery(GET_POTION_ORDERS, {
-    variables: {
-      filter: showAllOrders ? {} : { assigned_alchemist: alchemistName }
-    },
-    pollInterval: POLL_INTERVAL_MS,
-  });
+  const [data, setData] = useState<{ potionOrders: PotionOrder[] } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  const [updatePotionOrderStatus] = useMutation(UPDATE_POTION_ORDER_STATUS, {
-    refetchQueries: [{
-      query: GET_POTION_ORDERS,
-      variables: { filter: showAllOrders ? {} : { assigned_alchemist: alchemistName } }
-    }]
-  });
+  const fetchOrders = useCallback(async () => {
+    try {
+      const result = await graphqlRequest<{ potionOrders: PotionOrder[] }>(GET_POTION_ORDERS, {
+        filter: showAllOrders ? {} : { assigned_alchemist: alchemistName }
+      });
+      setData(result);
+      setError(null);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, [showAllOrders, alchemistName]);
 
-  const [updatePotionOrderAlchemist] = useMutation(UPDATE_POTION_ORDER_ALCHEMIST, {
-    refetchQueries: [{
-      query: GET_POTION_ORDERS,
-      variables: { filter: showAllOrders ? {} : { assigned_alchemist: alchemistName } }
-    }]
-  });
+  useEffect(() => {
+    fetchOrders();
+    const intervalId = setInterval(fetchOrders, POLL_INTERVAL_MS);
+    return () => clearInterval(intervalId);
+  }, [fetchOrders]);
 
-  const [addPotionOrder] = useMutation(ADD_POTION_ORDER, {
-    refetchQueries: [{
-      query: GET_POTION_ORDERS,
-      variables: { filter: showAllOrders ? {} : { assigned_alchemist: alchemistName } }
-    }]
-  });
+  const updatePotionOrderStatus = async ({ variables }: { variables: { id: string; status: string } }) => {
+    await graphqlRequest(UPDATE_POTION_ORDER_STATUS, variables);
+    await fetchOrders();
+  };
+
+  const updatePotionOrderAlchemist = async ({ variables }: { variables: { id: string; assigned_alchemist: string } }) => {
+    await graphqlRequest(UPDATE_POTION_ORDER_ALCHEMIST, variables);
+    await fetchOrders();
+  };
+
+  const addPotionOrder = async ({ variables }: { variables: { input: Record<string, unknown> } }) => {
+    await graphqlRequest(ADD_POTION_ORDER, variables);
+    await fetchOrders();
+  };
 
   useEffect(() => {
     const fetchAlchemists = async () => {

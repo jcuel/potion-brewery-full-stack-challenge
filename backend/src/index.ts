@@ -1,48 +1,58 @@
-import express from 'express';
-import cors from 'cors';
-import { ApolloServer } from '@apollo/server';
-import { expressMiddleware } from '@as-integrations/express4';
+import './suppressExperimentalWarnings';
+import express, { Request, Response, NextFunction } from 'express';
+import { graphql } from 'graphql';
 import { initializeDatabase } from './database/init';
 import alchemistRoutes from './api/alchemists';
-import { typeDefs, resolvers } from './api/potions';
+import { schema, root } from './api/potions';
 
 const PORT = process.env.PORT || 4000;
 
-async function startServer() {
+function startServer() {
   const app = express();
 
-  // Middleware
-  app.use(cors());
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    if (req.method === 'OPTIONS') {
+      res.sendStatus(204);
+      return;
+    }
+    next();
+  });
+
   app.use(express.json({ limit: '50mb' }));
 
-  // Initialize database
-  await initializeDatabase();
+  initializeDatabase();
   console.log('🧪 Database is ready');
 
-  // Health check
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', message: '🧙 The brewery is bubbling!' });
   });
 
-  // REST API routes
   app.use('/api', alchemistRoutes);
   console.log('⚗️  REST API routes mounted at /api');
 
-  // GraphQL setup
-  const apolloServer = new ApolloServer({
-    typeDefs,
-    resolvers,
+  app.post('/graphql', async (req, res) => {
+    const { query, variables, operationName } = req.body ?? {};
+
+    if (typeof query !== 'string') {
+      res.status(400).json({ errors: [{ message: 'A GraphQL query string is required.' }] });
+      return;
+    }
+
+    const result = await graphql({
+      schema,
+      source: query,
+      rootValue: root,
+      variableValues: variables,
+      operationName,
+    });
+
+    res.json(result);
   });
+  console.log('🔮 GraphQL endpoint mounted at /graphql');
 
-  await apolloServer.start();
-  console.log('🔮 Apollo Server started');
-
-  app.use(
-    '/graphql',
-    expressMiddleware(apolloServer)
-  );
-
-  // Start listening
   app.listen(PORT, () => {
     console.log('');
     console.log('🧪✨ Potion Brewery Backend is running! ✨🧪');
@@ -53,7 +63,9 @@ async function startServer() {
   });
 }
 
-startServer().catch((err) => {
+try {
+  startServer();
+} catch (err) {
   console.error('💥 Failed to start the Potion Brewery:', err);
   process.exit(1);
-});
+}

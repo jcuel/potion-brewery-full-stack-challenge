@@ -41,7 +41,6 @@ def get_alchemist(name: str):
 
     profile = dict(row)
 
-    # Count completed potions (status = 'Ready for Pickup')
     cursor.execute(
         "SELECT COUNT(*) as count FROM potion_orders WHERE assigned_alchemist = ? AND status = 'Ready for Pickup'",
         (name,)

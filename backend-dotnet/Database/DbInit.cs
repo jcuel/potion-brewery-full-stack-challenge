@@ -87,7 +87,6 @@ public static class DbInit
 
     private static void SeedPotionOrders(SqliteConnection connection)
     {
-        // Fixed sample orders
         var sampleOrders = new (string Id, string Customer, string Location, string Potion, string Alchemist, string Status, string Notes)[]
         {
             ("1", "Elena Vasquez", "Barcelona, Spain", "Essence of Invisibility", "Thistle Moonwhisper", "To Do",
@@ -107,8 +106,7 @@ public static class DbInit
             InsertOrder(connection, order.Id, order.Customer, order.Location, order.Potion, order.Alchemist, order.Status, order.Notes);
         }
 
-        // Generate 47 healing elixir orders in Quality Control for Bramblewood Fizzwick
-        var random = new Random(42); // Fixed seed for deterministic data
+        var random = new Random(42);
         for (int i = 0; i < SampleData.ElixirCount; i++)
         {
             var id = (7 + i).ToString();

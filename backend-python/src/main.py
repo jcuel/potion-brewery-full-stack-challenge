@@ -10,7 +10,6 @@ from src.api.potions import graphql_router
 
 app = FastAPI(title="Potion Brewery API")
 
-# CORS middleware - allow all origins
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,10 +18,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include REST API router
 app.include_router(api_router, prefix="/api")
 
-# Include GraphQL router
 app.include_router(graphql_router, prefix="/graphql")
 
 

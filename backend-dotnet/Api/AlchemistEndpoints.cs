@@ -7,7 +7,6 @@ public static class AlchemistEndpoints
 {
     public static void MapAlchemistEndpoints(this WebApplication app)
     {
-        // GET /api/alchemists — list all (name, profile_image)
         app.MapGet("/api/alchemists", (SqliteConnection db) =>
         {
             var alchemists = new List<object>();
@@ -25,7 +24,6 @@ public static class AlchemistEndpoints
             return Results.Ok(alchemists);
         });
 
-        // GET /api/alchemist/{name} — get profile + potions_completed
         app.MapGet("/api/alchemist/{name}", (string name, SqliteConnection db) =>
         {
             using var cmd = db.CreateCommand();
@@ -48,7 +46,6 @@ public static class AlchemistEndpoints
 
             reader.Close();
 
-            // Count completed potions
             using var countCmd = db.CreateCommand();
             countCmd.CommandText = "SELECT COUNT(*) FROM potion_orders WHERE assigned_alchemist = @name AND status = 'Ready for Pickup'";
             countCmd.Parameters.AddWithValue("@name", name);
@@ -64,7 +61,6 @@ public static class AlchemistEndpoints
             });
         });
 
-        // POST /api/alchemist — create
         app.MapPost("/api/alchemist", (AlchemistProfileCreate input, SqliteConnection db) =>
         {
             if (string.IsNullOrWhiteSpace(input.Name))
@@ -103,7 +99,6 @@ public static class AlchemistEndpoints
             }
         });
 
-        // PUT /api/alchemist/{name} — update service_start_date and/or profile_image
         app.MapPut("/api/alchemist/{name}", (string name, AlchemistProfileUpdate input, SqliteConnection db) =>
         {
             var setClauses = new List<string>();

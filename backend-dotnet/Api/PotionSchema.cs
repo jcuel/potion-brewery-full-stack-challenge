@@ -3,7 +3,6 @@ using PotionBrewery.Models;
 
 namespace PotionBrewery.Api;
 
-// --- Input types ---
 
 public class PotionOrderFilterInput
 {
@@ -32,7 +31,6 @@ public class PotionOrderInput
     public string? Notes { get; set; }
 }
 
-// --- GraphQL object type for PotionOrder ---
 
 [GraphQLName("PotionOrder")]
 public class PotionOrderType
@@ -59,7 +57,6 @@ public class PotionOrderType
     public string? Notes { get; set; }
 }
 
-// --- Query type ---
 
 public class PotionQuery
 {
@@ -121,7 +118,6 @@ public class PotionQuery
     };
 }
 
-// --- Mutation type ---
 
 public class PotionMutation
 {
