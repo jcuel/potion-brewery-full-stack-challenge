@@ -22,9 +22,11 @@ Dragging potion orders between production stages doesn't work.
 
 ### Feature
 
-Allow users to undo potion order changes, with a preview of what would be undone before confirming.
+Allow alchemists to undo their potion order changes, with a preview of what would be undone before confirming and dealing with conflicts gracefully.
 
-Your interviewer is your product manager: the line above is the starting point, and what "ideal" looks like is something you uncover by asking. We're as interested in how you run that conversation as in the code you write.
+Your interviewer will take the role of product manager for this one: the line above is the starting point, and what "ideal" looks like is something you uncover by asking.
+
+We're as interested in how you run that conversation as in the code you write.
 
 Scope is yours to set (how many levels of undo, which actions are undoable), and we expect deliberate trade-offs. Depending on the time you have, either of these is a strong outcome:
 
