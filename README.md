@@ -6,6 +6,8 @@ The goal of this repository is to provide us with a realistic setting to evaluat
 
 If you just send Claude off to handle everything, we learn nothing and have no grounds to advance you to the next steps.
 
+This challenge comes in several stack flavors: React with a Node.js, Python, or .NET backend. Pick whichever you're most comfortable in; they're equivalent in scope and difficulty. Setup for each is at the bottom.
+
 ## Tasks
 
 Complete these in order:
@@ -22,13 +24,16 @@ Dragging potion orders between production stages doesn't work.
 
 Allow users to undo potion order changes, with a preview of what would be undone before confirming.
 
-You decide the scope: how many levels of undo, and what actions can be undone.
+Your interviewer is your product manager: the line above is the starting point, and what "ideal" looks like is something you uncover by asking. We're as interested in how you run that conversation as in the code you write.
 
-**Before you start coding:** explain your approach. What would you implement, and why?
+Scope is yours to set (how many levels of undo, which actions are undoable), and we expect deliberate trade-offs. Depending on the time you have, either of these is a strong outcome:
+
+- **Propose the design.** Lay out the architecture you'd build toward and defend it, even if you write little of it.
+- **Build a slice.** Ship something working, and be explicit about what you chose to compromise on and why.
+
+Reaching the "ideal" in the time given is rare; navigating toward it deliberately is the point.
 
 ## Setup
-
-Choose a stack. All are equivalent in scope and difficulty.
 
 ### React Frontend + Node.js Backend
 
