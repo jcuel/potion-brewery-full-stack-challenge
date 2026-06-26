@@ -1,0 +1,5 @@
+scan:
+  skip-version-check: true
+  skip-dirs:
+    - /usr/local/lib/node_modules
+    - /opt/yarn-v1.22.22

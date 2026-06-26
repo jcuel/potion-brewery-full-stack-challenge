@@ -4,7 +4,10 @@
   "description": "Backend for Potion Brewery Full Stack Challenge",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "tsx --test src/api/potions.smoke.test.ts src/utils/validation.smoke.test.ts"
   },
   "engines": {
     "node": ">=24.0.0"

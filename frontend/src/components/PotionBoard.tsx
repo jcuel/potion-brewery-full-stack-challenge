@@ -5,6 +5,7 @@ import { getStatusEmoji, POLL_INTERVAL_MS, POTION_ORDER_STATUSES } from '../cons
 import { CreatePotionModal } from './modals/CreatePotionModal';
 import { ReassignModal } from './modals/ReassignModal';
 import type { PotionOrder, AlchemistProfileMinimal } from '../types';
+import { resolveDraggedOrderId, shouldApplyStatusChange } from '../utils/validation';
 import styles from './PotionBoard.module.css';
 
 const GET_POTION_ORDERS = `
@@ -141,14 +142,22 @@ export function PotionBoard({ alchemistName, profileUpdateTrigger }: PotionBoard
     fetchAlchemists();
   }, [profileUpdateTrigger]);
 
+  /** Persists a new kanban column via GraphQL and refreshes local order state. */
   const handleStatusChange = async (orderId: string, newStatus: string) => {
-    await updatePotionOrderStatus({
-      variables: { id: orderId, status: newStatus }
-    });
+    setActionError(null);
+    try {
+      await updatePotionOrderStatus({
+        variables: { id: orderId, status: newStatus }
+      });
+    } catch (err: any) {
+      setActionError(err.message || 'Failed to update potion order status');
+    }
   };
 
+  /** Stores the dragged order id on both React state and dataTransfer for reliable drop handling. */
   const handleDragStart = (e: React.DragEvent, orderId: string) => {
     setDraggedItem(orderId);
+    e.dataTransfer.setData('text/plain', orderId);
     e.dataTransfer.effectAllowed = 'move';
   };
 
@@ -161,14 +170,28 @@ export function PotionBoard({ alchemistName, profileUpdateTrigger }: PotionBoard
     setDragOverColumn(null);
   };
 
+  /**
+   * Handles drops on kanban columns and cards (Bug 2b).
+   * Cards must register drop handlers because HTML5 DnD targets the element under the cursor.
+   */
   const handleDrop = async (e: React.DragEvent, newStatus: string) => {
     e.preventDefault();
+    e.stopPropagation();
     setDragOverColumn(null);
 
-    if (draggedItem) {
-      await handleStatusChange(draggedItem, newStatus);
+    const orderId = resolveDraggedOrderId(e.dataTransfer.getData('text/plain'), draggedItem);
+    if (!orderId) {
+      setDraggedItem(null);
+      return;
     }
 
+    const currentOrder = data?.potionOrders.find((order) => order.id === orderId);
+    if (!shouldApplyStatusChange(orderId, currentOrder?.status, newStatus)) {
+      setDraggedItem(null);
+      return;
+    }
+
+    await handleStatusChange(orderId, newStatus);
     setDraggedItem(null);
   };
 
@@ -255,6 +278,8 @@ export function PotionBoard({ alchemistName, profileUpdateTrigger }: PotionBoard
                     className={`kanban-card ${draggedItem === order.id ? 'dragging' : ''}`}
                     draggable
                     onDragStart={(e) => handleDragStart(e, order.id)}
+                    onDragOver={(e) => handleDragOver(e, status)}
+                    onDrop={(e) => handleDrop(e, status)}
                   >
                     <div className={styles.cardHeader}>
                       <div className={styles.cardPotionInfo}>

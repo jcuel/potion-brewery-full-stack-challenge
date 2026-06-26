@@ -16,13 +16,22 @@
     "start": "concurrently \"npm run backend:node\" \"npm run frontend\"",
     "start:node": "npm start",
     "start:python": "concurrently \"npm run backend:python\" \"npm run frontend\"",
-    "start:dotnet": "concurrently \"npm run backend:dotnet\" \"npm run frontend\""
+    "start:dotnet": "concurrently \"npm run backend:dotnet\" \"npm run frontend\"",
+    "test:unit": "npm run test --prefix frontend && docker compose exec -T backend npm test",
+    "test:unit:backend:local": "npm run test --prefix backend",
+    "test:smoke": "tsx --test tests/smoke/integration.test.ts",
+    "test:all": "npm run test:unit && npm run test:smoke",
+    "scan:trivy": "node scripts/trivy-scan.mjs",
+    "scan:trivy:library": "node scripts/trivy-scan.mjs --library",
+    "ci": "node scripts/run-ci.mjs",
+    "ci:full": "node scripts/run-ci.mjs --trivy"
   },
   "license": "MIT",
   "engines": {
     "node": ">=24.0.0"
   },
   "devDependencies": {
-    "concurrently": "^10.0.3"
+    "concurrently": "^10.0.3",
+    "tsx": "^4.7.0"
   }
 }

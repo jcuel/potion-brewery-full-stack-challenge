@@ -9,6 +9,9 @@ export const getInitials = (name: string): string => {
     .slice(0, PROFILE_INITIALS_MAX_LENGTH);
 };
 
+/**
+ * Parses an ISO date string (`YYYY-MM-DD`) as local midnight, avoiding UTC timezone drift.
+ */
 export const parseLocalDate = (dateString: string): Date => {
   const [year, month, day] = dateString.split('-').map(Number);
   return new Date(year, month - 1, day);
