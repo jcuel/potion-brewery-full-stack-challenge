@@ -55,7 +55,8 @@ const workflowUrl = runId && repo
   ? `${server}/${repo}/actions/runs/${runId}`
   : '';
 
-const body = `## ${statusEmoji} CI Results — ${statusLabel}
+const body = `<!-- potion-brewery-ci-results -->
+## ${statusEmoji} CI Results — ${statusLabel}
 
 **Commit:** \`${shortSha}\`${workflowUrl ? ` · [View workflow run](${workflowUrl})` : ''}
 
