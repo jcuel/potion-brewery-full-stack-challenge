@@ -14,6 +14,7 @@ const severity = process.env.TRIVY_SEVERITY ?? 'HIGH,CRITICAL';
 const exitCode = process.env.TRIVY_EXIT_CODE ?? '1';
 const libraryOnly = process.argv.includes('--library') || process.env.TRIVY_LIBRARY_ONLY === '1';
 const reportsDir = process.env.TRIVY_REPORT_DIR ?? 'reports';
+const trivyConfig = join(process.cwd(), 'trivy.yaml');
 
 function run(command, args) {
   const result = spawnSync(command, args, { stdio: 'inherit', shell: process.platform === 'win32' });
@@ -35,8 +36,12 @@ for (const image of images) {
     '--rm',
     '-v',
     '/var/run/docker.sock:/var/run/docker.sock',
+    '-v',
+    `${trivyConfig}:/trivy.yaml:ro`,
     'aquasec/trivy:latest',
     'image',
+    '--config',
+    '/trivy.yaml',
     '--severity',
     severity,
     '--exit-code',
