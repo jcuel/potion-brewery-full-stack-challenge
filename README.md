@@ -1,5 +1,7 @@
 # Potion Brewery Full Stack Challenge
 
+![CI](https://github.com/iscaltritti-agilityio/potion-brewery-full-stack-challenge/actions/workflows/ci.yml/badge.svg)
+
 The goal of this repository is to provide us with a realistic setting to evaluate how you apply your experience, troubleshooting, AI fluency, and architectural judgment.
 
 **AI use is permitted, just... use it to your real advantage**. Your job is to showcase your technical and critical-thinking abilities.
@@ -7,6 +9,13 @@ The goal of this repository is to provide us with a realistic setting to evaluat
 If you just send Claude off to handle everything, we learn nothing and have no grounds to advance you to the next steps.
 
 This challenge comes in several stack flavors: React with a Node.js, Python, or .NET backend. Pick whichever you're most comfortable in; they're equivalent in scope and difficulty. Setup for each is at the bottom.
+
+## Documentation (Node.js stack)
+
+| Doc | Contents |
+|-----|----------|
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | System design, APIs, request flows, Docker topology |
+| [BUGFIXES.md](./BUGFIXES.md) | Bugs fixed, test results, CI/Trivy pipeline |
 
 ## Tasks
 
@@ -45,6 +54,24 @@ Reaching the "ideal" in the time given is rare; navigating toward it deliberatel
 npm run setup
 npm start
 ```
+
+**Docker (recommended for first run):**
+
+```bash
+docker compose up --build
+# Frontend: http://localhost:3000
+# Backend:  http://localhost:4000
+```
+
+**Verify fixes (22 automated tests):**
+
+```bash
+docker compose up -d --build
+npm run ci              # build + unit + integration smoke tests
+npm run scan:trivy:library   # optional: app dependency scan
+```
+
+Pull requests receive an automated CI results comment. See [BUGFIXES.md](./BUGFIXES.md) for details.
 
 ### React Frontend + Python Backend
 

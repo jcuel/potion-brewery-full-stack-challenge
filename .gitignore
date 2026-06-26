@@ -9,6 +9,7 @@ dist/
 *.sqlite
 *.sqlite3
 package-lock.json
+reports/
 bin/
 obj/
 __pycache__/

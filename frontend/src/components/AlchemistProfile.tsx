@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getInitials, calculateYearsOfService, formatDate, parseLocalDate } from '../utils/helpers';
+import { getInitials, calculateYearsOfService, formatDate } from '../utils/helpers';
+import { validateServiceStartDate } from '../utils/validation';
 import { compressImage } from '../utils/imageCompression';
 import type { AlchemistProfile } from '../types';
 import styles from './AlchemistProfile.module.css';
@@ -43,17 +44,15 @@ export function AlchemistProfile({ alchemistName, isEditing, setIsEditing, onPro
     }
   };
 
+  /** Validates the service start date client-side before calling the REST profile API. */
   const updateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const startDate = parseLocalDate(formData.service_start_date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (startDate < today) {
-      setError('Service start date cannot be in the future');
+    const validationError = validateServiceStartDate(formData.service_start_date);
+    if (validationError) {
+      setError(validationError);
       setLoading(false);
       return;
     }

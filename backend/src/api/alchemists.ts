@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { db } from '../database/init';
+import { validateServiceStartDate } from '../utils/validation';
 
 const router = Router();
 
@@ -51,6 +52,11 @@ router.post('/alchemist', (req: Request, res: Response) => {
 
   const startDate = service_start_date || new Date().toISOString().split('T')[0];
 
+  const dateError = validateServiceStartDate(startDate);
+  if (dateError) {
+    return res.status(400).json({ error: dateError });
+  }
+
   try {
     const info = db
       .prepare(
@@ -81,6 +87,10 @@ router.put('/alchemist/:name', (req: Request, res: Response) => {
   const values: any[] = [];
 
   if (service_start_date !== undefined) {
+    const dateError = validateServiceStartDate(service_start_date);
+    if (dateError) {
+      return res.status(400).json({ error: dateError });
+    }
     updates.push('service_start_date = ?');
     values.push(service_start_date);
   }

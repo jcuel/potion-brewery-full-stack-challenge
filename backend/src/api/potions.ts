@@ -76,12 +76,18 @@ export const root = {
     return db.prepare('SELECT * FROM potion_orders WHERE id = ?').get(id);
   },
 
+  /**
+   * Updates a potion order's production stage and persists the change (Bug 2a fix).
+   * Previously this resolver validated the status but returned the existing row without UPDATE.
+   */
   updatePotionOrderStatus: ({ id, status }: { id: string; status: string }) => {
     if (!VALID_STATUSES.includes(status as any)) {
       throw new Error(`Invalid status: ${status}. Must be one of: ${VALID_STATUSES.join(', ')}`);
     }
 
-    const row = db.prepare('SELECT * FROM potion_orders WHERE id = ?').get(id);
+    const row = db
+      .prepare('UPDATE potion_orders SET status = ? WHERE id = ? RETURNING *')
+      .get(status, id);
     if (!row) {
       throw new Error(`Potion order with id ${id} not found`);
     }
