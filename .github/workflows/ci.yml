@@ -132,7 +132,7 @@ jobs:
           docker compose build
 
       - name: Scan backend image (app libraries — blocking)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: demo-backend
           format: table
@@ -143,7 +143,7 @@ jobs:
           output: reports/trivy-demo-backend.txt
 
       - name: Scan frontend image (app libraries — blocking)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: demo-frontend
           format: table
@@ -154,7 +154,7 @@ jobs:
           output: reports/trivy-demo-frontend.txt
 
       - name: Scan backend image (full — informational)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: demo-backend
           format: sarif
