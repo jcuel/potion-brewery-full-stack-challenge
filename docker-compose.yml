@@ -1,5 +1,6 @@
 services:
   backend:
+    image: demo-backend
     build: ./backend
     ports:
       - "4000:4000"
@@ -21,6 +22,7 @@ services:
       start_period: 10s
 
   frontend:
+    image: demo-frontend
     build: ./frontend
     ports:
       - "3000:3000"
