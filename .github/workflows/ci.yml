@@ -141,6 +141,7 @@ jobs:
           vuln-type: library
           exit-code: '1'
           output: reports/trivy-demo-backend.txt
+          args: --skip-version-check
 
       - name: Scan frontend image (app libraries — blocking)
         uses: aquasecurity/trivy-action@0.35.0
@@ -152,6 +153,7 @@ jobs:
           vuln-type: library
           exit-code: '1'
           output: reports/trivy-demo-frontend.txt
+          args: --skip-version-check
 
       - name: Scan backend image (full — informational)
         uses: aquasecurity/trivy-action@0.35.0
@@ -161,6 +163,7 @@ jobs:
           severity: HIGH,CRITICAL
           exit-code: '0'
           output: reports/trivy-backend-full.sarif
+          args: --skip-version-check
 
       - name: Upload Trivy SARIF
         uses: github/codeql-action/upload-sarif@v3
