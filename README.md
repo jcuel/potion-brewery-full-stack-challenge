@@ -1,6 +1,6 @@
 # Potion Brewery Full Stack Challenge
 
-![CI](https://github.com/iscaltritti-agilityio/potion-brewery-full-stack-challenge/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/jcuel/potion-brewery-full-stack-challenge/actions/workflows/ci.yml/badge.svg)
 
 The goal of this repository is to provide us with a realistic setting to evaluate how you apply your experience, troubleshooting, AI fluency, and architectural judgment.
 
